@@ -38,30 +38,48 @@ ONBOARDING_HTML="""
 """
 
 def _show_dialog():
-    """Hàm nội bộ để hiển thị st.dialog bằng cú pháp context manager đúng."""
+    """
+    Hàm nội bộ để hiển thị st.dialog.
+    Sửa lỗi bằng cách loại bỏ tham số on_dismiss và xử lý việc đóng dialog.
+    """
     
-    # Sử dụng 'with' thay vì '@'
-    with st.dialog("Hướng dẫn cho người mới bắt đầu", on_dismiss=lambda: st.session_state.update(onboarding_complete=True)):
+    # st.dialog trả về True nếu đang mở, False nếu đã đóng.
+    # Chúng ta lưu trạng thái này vào một biến.
+    dialog_is_open = st.dialog("Hướng dẫn cho người mới bắt đầu")
+
+    if dialog_is_open:
+        # Nếu dialog đang mở, hiển thị nội dung bên trong
         st.markdown(ONBOARDING_HTML, unsafe_allow_html=True)
-        # Khi nhấn nút này, state sẽ được set và rerun để đóng dialog
         if st.button("Tôi đã hiểu!", use_container_width=True, type="secondary"):
             st.session_state.onboarding_complete = True
-            st.rerun()
+            st.rerun() # Chạy lại để đóng dialog và cập nhật app
+    else:
+        # Nếu dialog đã bị người dùng đóng (nhấn 'X' hoặc Esc)
+        # Chúng ta cũng cần cập nhật state và rerun để đảm bảo nó không hiện lại
+        st.session_state.onboarding_complete = True
+        st.rerun()
+
 
 def display_onboarding_features():
     """Hàm chính để quản lý và hiển thị các tính năng onboarding."""
     
-    # Tự động hiển thị dialog cho người dùng mới
-    if not st.session_state.get("onboarding_complete"):
+    # Tạo một key riêng để quyết định có nên mở dialog hay không
+    # Điều này giúp tránh việc rerun vô hạn
+    if 'show_dialog_flag' not in st.session_state:
+        # Lần đầu tiên chạy, nếu chưa hoàn thành onboarding thì set flag
+        st.session_state.show_dialog_flag = not st.session_state.get("onboarding_complete", False)
+
+    # Nếu nút '?' được nhấn, set flag để mở dialog
+    if st.button("Show Onboarding", key="show-onboarding-button"):
+        st.session_state.show_dialog_flag = True
+
+    # Chỉ gọi _show_dialog nếu flag được bật
+    if st.session_state.get("show_dialog_flag", False):
         _show_dialog()
-    
+
     # Hiển thị nút trợ giúp nổi
     st.markdown("""
         <div class="help-button-container">
             <button class="help-button" onclick="document.getElementById('show-onboarding-button').click();">?</button>
         </div>
     """, unsafe_allow_html=True)
-    
-    # Nút ẩn để kích hoạt lại dialog từ nút trợ giúp
-    if st.button("Show Onboarding", key="show-onboarding-button"):
-        _show_dialog()
