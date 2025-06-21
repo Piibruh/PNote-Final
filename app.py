@@ -5,10 +5,16 @@ from ui import utils, sidebar, onboarding
 from core.services import service_manager
 from config import CHROMA_DB_PATH, USER_DATA_PATH, GEMINI_API_KEY
 
-if "theme" not in st.session_state: st.session_state.theme = "Dark"
-if "onboarding_complete" not in st.session_state: st.session_state.onboarding_complete = False
+# --- BƯỚC 1: KHỞI TẠO STATE & CẤU HÌNH TRANG ---
+if "theme" not in st.session_state:
+    st.session_state.theme = "Dark"
+# State này sẽ được quản lý bởi st.tour()
+if "onboarding_complete" not in st.session_state:
+    st.session_state.onboarding_complete = False
+
 utils.page_init("PNote AI - Trang chủ")
 
+# --- BƯỚC 2: KIỂM TRA & KHỞI TẠO ---
 if not GEMINI_API_KEY:
     st.error("LỖI CẤU HÌNH: Không tìm thấy GEMINI_API_KEY."); st.stop()
 
@@ -22,9 +28,19 @@ if "sm" not in st.session_state:
 else:
     st.session_state.courses = st.session_state.sm.list_courses()
 
+# --- BƯỚC 3: VẼ GIAO DIỆN ---
 sidebar.display()
-onboarding.display_onboarding_features()
+# Truyền 'home' để onboarding biết cần chạy tour cho trang chủ
+onboarding.display_onboarding_features("home")
 
+# --- BƯỚC 4: HIỂN THỊ NỘI DUNG CHÍNH ---
+# Nếu người dùng chưa từng hoàn thành onboarding, hiển thị bảng chào mừng
+if not st.session_state.onboarding_complete:
+    onboarding.display_welcome_and_capabilities()
+    st.markdown("---")
+
+
+# Hiển thị nội dung tùy thuộc vào việc đã có workspace chưa
 if not st.session_state.get("cid"):
     st.info("👈 Bắt đầu bằng cách tạo hoặc chọn một không gian làm việc từ thanh sidebar.")
 else:
