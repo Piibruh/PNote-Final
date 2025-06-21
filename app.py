@@ -1,10 +1,32 @@
 # app.py
+
+# Ghi chú: Đây là file trang Dashboard, là điểm vào đầu tiên của ứng dụng.
+# Nó chịu trách nhiệm hiển thị danh sách khóa học và cho phép tạo khóa học mới.
+
 import streamlit as st
 from core.services import service_manager, slugify
 from ui.utils import page_setup
+# NEW: Import hàm onboarding_popup trực tiếp
+from ui.onboarding import onboarding_popup
 import time
 
+# --- BƯỚC 1: THIẾT LẬP TRANG ---
+# Ghi chú: Hàm này sẽ cấu hình trang, áp dụng CSS, và quan trọng nhất là
+# đặt cờ "show_onboarding_popup" trong session_state nếu cần.
 page_setup(page_title="PNote Dashboard", page_icon="📝", initial_sidebar_state="collapsed")
+
+# --- BƯỚC 2: XỬ LÝ CÁC HÀNH ĐỘNG TOÀN CỤC Ở CẤP CAO NHẤT ---
+# NEW: Đây là logic mới để xử lý popup một cách an toàn.
+# Nó kiểm tra cờ đã được đặt bởi page_setup().
+if st.session_state.get('show_onboarding_popup', False):
+    # Gọi hàm hiển thị popup ở đây, tại cấp cao nhất của trang.
+    onboarding_popup()
+    # Sau khi dialog được gọi, tắt cờ này đi để nó không hiện lại trong các lần rerun sau.
+    st.session_state.show_onboarding_popup = False
+
+
+# --- BƯỚC 3: HIỂN THỊ GIAO DIỆN CHÍNH CỦA TRANG ---
+# Ghi chú: Phần code dưới đây không thay đổi so với phiên bản trước.
 
 st.markdown("""<div class="logo-box-large"><span class="logo-text-large">P</span></div>""", unsafe_allow_html=True)
 st.title("PNote Workspace")
