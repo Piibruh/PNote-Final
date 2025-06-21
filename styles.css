@@ -1,0 +1,142 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- ĐỊNH NGHĨA BIẾN MÀU CHO CẢ 2 THEME --- */
+:root {
+    --font-sans: 'Inter', sans-serif;
+    --border-radius-large: 16px; /* Bo tròn nhiều */
+    --border-radius-medium: 12px;
+    --border-radius-small: 8px;
+    --transition-speed: 0.2s;
+
+    /* Biến sẽ được ghi đè bởi class .dark-theme hoặc .light-theme */
+    --primary-color: #FF9800;
+    --primary-color-hover: #FB8C00;
+    --danger-color: #D32F2F;
+    --danger-color-hover: #B71C1C;
+    --main-bg: #FFFFFF;
+    --secondary-bg: #F5F5F5;
+    --sidebar-bg: #F0F0F0;
+    --text-color: #111111;
+    --text-secondary: #555555;
+    --border-color: #E0E0E0;
+    --shadow-color: rgba(0,0,0,0.1);
+}
+
+.dark-theme {
+    --primary-color: #FF9800;
+    --primary-color-hover: #FB8C00;
+    --danger-color: #EF5350;
+    --danger-color-hover: #E53935;
+    --main-bg: #171717;
+    --secondary-bg: #242424;
+    --sidebar-bg: #111111;
+    --text-color: #EAEAEA;
+    --text-secondary: #A0A0A0;
+    --border-color: #3A3A3A;
+    --shadow-color: rgba(0,0,0,0.4);
+}
+
+/* --- ÁP DỤNG BIẾN MÀU LÊN CÁC THÀNH PHẦN --- */
+body {
+    background-color: var(--main-bg) !important;
+    color: var(--text-color);
+    font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color) !important;
+    font-weight: 600;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border-color);
+}
+
+/* --- THẺ, KHUNG, NỀN --- */
+.course-card, [data-testid="stExpander"], [data-testid="stChatMessageContent"], .stAlert {
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-large);
+    transition: all var(--transition-speed) ease;
+}
+
+[data-testid="stExpander"] > details {
+    border-radius: var(--border-radius-large);
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    border-color: var(--primary-color);
+}
+
+/* --- Ô NHẬP LIỆU & LỰA CHỌN --- */
+textarea, .stTextInput > div > div > input, .stSelectbox > div {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--border-radius-medium) !important;
+}
+textarea:focus, .stTextInput > div > div > input:focus, .stSelectbox > div:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+}
+
+/* --- NÚT BẤM --- */
+.stButton>button {
+    border-radius: var(--border-radius-medium);
+    background-color: var(--secondary-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 12px 18px;
+    font-weight: 600;
+    transition: all var(--transition-speed) ease;
+}
+.stButton>button:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+.stButton>button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Nút chính */
+.stForm .stButton>button, .stButton>button[type="secondary"], .stDownloadButton>button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+.stForm .stButton>button:hover, .stButton>button[type="secondary"]:hover, .stDownloadButton>button:hover {
+    background-color: var(--primary-color-hover);
+    color: white;
+}
+
+/* Nút nguy hiểm */
+.stButton>button[type="primary"] {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+}
+.stButton>button[type="primary"]:hover {
+    background-color: var(--danger-color-hover);
+}
+
+/* --- GIAO DIỆN CHAT --- */
+[data-testid="stChatMessage"]:has(span[data-testid="chat-avatar-user"]) [data-testid="stChatMessageContent"] {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* --- CÁC THÀNH PHẦN GIAO DIỆN PHỤ --- */
+button[data-testid="stButton"][key="show-onboarding-button"] { display: none; }
+.doc-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px;
+    border-radius: 6px;
+}
