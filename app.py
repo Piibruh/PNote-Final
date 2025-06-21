@@ -6,14 +6,13 @@ from core.services import service_manager
 from config import CHROMA_DB_PATH, USER_DATA_PATH, GEMINI_API_KEY
 
 if "theme" not in st.session_state: st.session_state.theme = "Dark"
+if "onboarding_complete" not in st.session_state: st.session_state.onboarding_complete = False
 utils.page_init("PNote AI - Trang chủ")
 
 if not GEMINI_API_KEY:
-    st.error("LỖI CẤU HÌNH: Không tìm thấy GEMINI_API_KEY.")
-    st.stop()
+    st.error("LỖI CẤU HÌNH: Không tìm thấy GEMINI_API_KEY."); st.stop()
 
-os.makedirs(CHROMA_DB_PATH, exist_ok=True)
-os.makedirs(USER_DATA_PATH, exist_ok=True)
+os.makedirs(CHROMA_DB_PATH, exist_ok=True); os.makedirs(USER_DATA_PATH, exist_ok=True)
 
 if "sm" not in st.session_state:
     st.session_state.sm = service_manager
@@ -24,10 +23,11 @@ else:
     st.session_state.courses = st.session_state.sm.list_courses()
 
 sidebar.display()
+onboarding.display_onboarding_features()
 
 if not st.session_state.get("cid"):
-    onboarding.display()
+    st.info("👈 Bắt đầu bằng cách tạo hoặc chọn một không gian làm việc từ thanh sidebar.")
 else:
     name = next((c['name'] for c in st.session_state.courses if c['id'] == st.session_state.cid), "...")
     st.title(f"🚀 Không gian làm việc: {name}")
-    st.page_link("pages/workspace.py", label="**Đi đến Workspace →**", icon="📝")
+    st.page_link("pages/workspace.py", label="**Đi đến Workspace để bắt đầu →**", icon="📝")
