@@ -1,42 +1,10 @@
-# requirements.txt
-
-# Ghi chú: Đây là danh sách các thư viện với phiên bản được "ghim" lại
-# để đảm bảo tính ổn định và khả năng tái tạo môi trường khi deploy.
-# Việc chỉ định phiên bản cụ thể giúp tránh các lỗi không mong muốn
-# do các thư viện tự động cập nhật lên phiên bản mới không tương thích.
-
-# Thư viện giao diện chính
-streamlit==1.35.0
-
-# Thư viện AI của Google
-google-generativeai==0.6.0
-
-# Gói xử lý văn bản và tokenization
-tiktoken==0.7.0
-
-# Các thư viện trích xuất dữ liệu từ nhiều nguồn
-pypdf==4.2.0
-python-docx==1.1.2
-beautifulsoup4==4.12.3
-requests==2.32.3
-youtube-transcript-api==0.6.2
-
-# Thư viện để đọc biến môi trường từ file .env (chỉ dùng ở local)
-python-dotenv==1.0.1
-
-# ==============================================================================
-# GIẢI PHÁP CHO VẤN ĐỀ SQLITE3 TRÊN STREAMLIT CLOUD (Rất Quan Trọng)
-#
-# Lý do: Streamlit Cloud chạy trên môi trường Linux tối giản, thiếu phiên bản
-# thư viện GLIBC mà các phiên bản ChromaDB mới nhất yêu cầu cho SQLite.
-#
-# Giải pháp:
-# 1. Sử dụng một phiên bản ChromaDB cũ hơn (`0.4.24`) đã được kiểm chứng là
-#    hoạt động ổn định trong môi trường này.
-# 2. Sử dụng `pysqlite3-binary` để cung cấp một bản sao SQLite tương thích,
-#    độc lập với hệ điều hành của server.
-#
-# Sự kết hợp này là giải pháp đáng tin cậy nhất để giải quyết lỗi.
-# ==============================================================================
-chromadb==0.4.24
-pysqlite3-binary==0.5.2
+streamlit
+google-generativeai
+chromadb
+pypdf
+python-docx
+beautifulsoup4
+youtube-transcript-api
+tiktoken
+# BẮT BUỘC: Sửa lỗi SQLite trên môi trường Streamlit Cloud và các môi trường tương tự.
+pysqlite3-binary
