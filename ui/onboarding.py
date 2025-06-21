@@ -1,85 +1,95 @@
 # pnote-ai-app/ui/onboarding.py
-
 import streamlit as st
 
-ONBOARDING_HTML="""
-<div class="onboarding-container">
-    <div class="onboarding-header">
-        <h2>Chào mừng bạn đến với PNote AI! 🚀</h2>
-        <p>Đây là trợ lý học tập cá nhân của bạn. Hãy xem qua 3 bước để bắt đầu nhé.</p>
-    </div>
-    <div class="onboarding-steps">
-        <div class="step">
-            <div class="step-icon">1️⃣</div>
-            <div class="step-text">
-                <h3>Tạo Không gian làm việc</h3>
-                <p>Mỗi không gian làm việc là nơi riêng cho một môn học. Hãy bắt đầu bằng cách <strong>tạo một không gian mới</strong> ở thanh sidebar.</p>
-            </div>
-        </div>
-        <div class="step">
-            <div class="step-icon">2️⃣</div>
-            <div class="step-text">
-                <h3>Thêm Tài liệu</h3>
-                <p>Sau khi vào Workspace, hãy đến tab <strong>"📚 Tài liệu"</strong> để "dạy" cho AI. Bạn có thể tải lên file hoặc dán link web, YouTube.</p>
-            </div>
-        </div>
-        <div class="step">
-            <div class="step-icon">3️⃣</div>
-            <div class="step-text">
-                <h3>Khám phá & Học tập</h3>
-                <p>Giờ đây, bạn có thể <strong>trò chuyện, tóm tắt, phân tích,</strong> hoặc tạo <strong>bộ câu hỏi ôn tập</strong>. Tất cả đều nằm trong các tab của Workspace!</p>
-            </div>
-        </div>
-    </div>
-    <div class="onboarding-footer">
-        <p>Sẵn sàng chưa? Hãy đóng cửa sổ này và khám phá nhé!</p>
-    </div>
-</div>
-"""
-
-def _show_dialog():
-    """
-    Hàm nội bộ để hiển thị st.dialog.
-    Sửa lỗi bằng cách loại bỏ tham số on_dismiss và xử lý việc đóng dialog.
-    """
+# --- BẢNG CHỨC NĂNG (THEO GỢI Ý CỦA BẠN) ---
+def display_welcome_and_capabilities():
+    """Hiển thị một bảng chào mừng và các chức năng chính của PNote AI."""
+    st.success("🎉 Chào mừng bạn đến với PNote AI! Dưới đây là những gì bạn có thể làm:")
     
-    # st.dialog trả về True nếu đang mở, False nếu đã đóng.
-    # Chúng ta lưu trạng thái này vào một biến.
-    dialog_is_open = st.dialog("Hướng dẫn cho người mới bắt đầu")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        #### 💬 Tương tác & Hỏi đáp
+        - **Trò chuyện với tài liệu:** Hỏi đáp trực tiếp với nội dung bạn tải lên.
+        - **Hỗ trợ đa định dạng:** Tải lên file PDF, DOCX hoặc dán link web, YouTube.
+        - **Lịch sử trò chuyện:** Lưu lại toàn bộ cuộc hội thoại cho từng không gian làm việc.
+        """)
+    with col2:
+        st.markdown("""
+        #### 🧠 Phân tích & Học tập
+        - **Tóm tắt thông minh:** Yêu cầu AI tóm tắt toàn bộ tài liệu chỉ bằng một cú nhấp chuột.
+        - **Trích xuất từ khóa:** Tự động tìm ra các chủ đề chính.
+        - **Tạo bộ câu hỏi:** Sinh ra các câu hỏi trắc nghiệm và tự luận để bạn ôn tập.
+        """)
+        
+    st.info("💡 **Mẹo:** Bạn có thể bắt đầu **Tour Hướng dẫn Tương tác** bất cứ lúc nào bằng cách nhấn vào nút **?** ở góc dưới bên phải màn hình.")
 
-    if dialog_is_open:
-        # Nếu dialog đang mở, hiển thị nội dung bên trong
-        st.markdown(ONBOARDING_HTML, unsafe_allow_html=True)
-        if st.button("Tôi đã hiểu!", use_container_width=True, type="secondary"):
-            st.session_state.onboarding_complete = True
-            st.rerun() # Chạy lại để đóng dialog và cập nhật app
-    else:
-        # Nếu dialog đã bị người dùng đóng (nhấn 'X' hoặc Esc)
-        # Chúng ta cũng cần cập nhật state và rerun để đảm bảo nó không hiện lại
+
+# --- TOUR HƯỚNG DẪN TƯƠNG TÁC ---
+def run_interactive_tour(page: str):
+    """Chạy một tour hướng dẫn dựa trên trang hiện tại ('home' hoặc 'workspace')."""
+    
+    tour_steps = []
+    if page == "home":
+        tour_steps = [
+            st.TourStep(
+                "section[data-testid='stSidebar']",
+                "Chào mừng bạn! Đây là **Sidebar**, trung tâm điều khiển của bạn. Mọi thứ bắt đầu từ đây.",
+            ),
+            st.TourStep(
+                '[data-testid="stExpander"]',
+                "Để bắt đầu, hãy mở mục **'Quản lý'** và tạo một **Không gian làm việc** mới cho môn học hoặc dự án của bạn.",
+                placement="right",
+            ),
+            st.TourStep(
+                '[data-testid="stPageLink"]',
+                "Sau khi tạo và chọn một không gian, hãy nhấn vào đây để đi đến **Workspace**, nơi điều kỳ diệu xảy ra!",
+            ),
+        ]
+    elif page == "workspace":
+        tour_steps = [
+            st.TourStep(
+                "[data-testid='stTabs']",
+                "Chào mừng đến Workspace! Các chức năng chính được sắp xếp trong các **Tab** này.",
+            ),
+            st.TourStep(
+                # Selector này nhắm đến tab thứ hai
+                "[data-testid='stTabs'] .st-emotion-cache-110fgir:nth-of-type(2)",
+                "Hãy bắt đầu bằng cách vào tab **'Tài liệu'** để 'dạy' cho AI bằng cách tải lên file hoặc dán link.",
+            ),
+            st.TourStep(
+                # Selector này nhắm đến tab đầu tiên
+                "[data-testid='stTabs'] .st-emotion-cache-110fgir:nth-of-type(1)",
+                "Sau khi có tài liệu, bạn có thể quay lại tab **'Trò chuyện'** để hỏi đáp với AI.",
+            ),
+            st.TourStep(
+                # Selector này nhắm đến tab cuối cùng
+                "[data-testid='stTabs'] .st-emotion-cache-110fgir:nth-of-type(5)",
+                "Đừng quên khám phá các công cụ học tập mạnh mẽ như tạo Quiz và câu hỏi tự luận ở tab **'Học tập AI'** nhé!",
+            ),
+        ]
+
+    # Bắt đầu tour
+    if tour_steps:
+        st.tour(tour_steps)
+        # Đánh dấu là đã hoàn thành để không tự động hiện lại
         st.session_state.onboarding_complete = True
-        st.rerun()
 
 
-def display_onboarding_features():
-    """Hàm chính để quản lý và hiển thị các tính năng onboarding."""
+def display_onboarding_features(page: str):
+    """
+    Hàm quản lý chính:
+    1. Hiển thị nút trợ giúp nổi (?).
+    2. Xử lý logic khi nút ? được nhấn để bắt đầu tour.
+    """
     
-    # Tạo một key riêng để quyết định có nên mở dialog hay không
-    # Điều này giúp tránh việc rerun vô hạn
-    if 'show_dialog_flag' not in st.session_state:
-        # Lần đầu tiên chạy, nếu chưa hoàn thành onboarding thì set flag
-        st.session_state.show_dialog_flag = not st.session_state.get("onboarding_complete", False)
-
-    # Nếu nút '?' được nhấn, set flag để mở dialog
-    if st.button("Show Onboarding", key="show-onboarding-button"):
-        st.session_state.show_dialog_flag = True
-
-    # Chỉ gọi _show_dialog nếu flag được bật
-    if st.session_state.get("show_dialog_flag", False):
-        _show_dialog()
-
-    # Hiển thị nút trợ giúp nổi
+    # Luôn hiển thị nút trợ giúp
     st.markdown("""
         <div class="help-button-container">
-            <button class="help-button" onclick="document.getElementById('show-onboarding-button').click();">?</button>
+            <button class="help-button" onclick="document.getElementById('start-interactive-tour-button').click();">?</button>
         </div>
     """, unsafe_allow_html=True)
+
+    # Nút ẩn, được kích hoạt bởi nút '?'
+    if st.button("Start Tour", key="start-interactive-tour-button"):
+        run_interactive_tour(page)
