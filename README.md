@@ -158,4 +158,4 @@ MIT License - xem file LICENSE để biết thêm chi tiết.
 
 ---
 
-**PNote** - Biến việc học tập trở nên thông minh hơn! 🚀 
+**PNote** - Biến việc học tập trở nên thông minh hơn! 🚀
