@@ -1,45 +1,46 @@
-# config.py
-import os
+# pnote-ai-app/config.py
 import streamlit as st
-from dotenv import load_dotenv
+import os
 
-# Tải biến môi trường từ file .env (chỉ có tác dụng khi chạy local)
-load_dotenv()
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+CHROMA_DB_PATH = os.path.join(ROOT_DIR, "chroma_db")
+USER_DATA_PATH = os.path.join(ROOT_DIR, "user_data")
 
-def get_gemini_api_key():
-    """
-    Hàm lấy API key một cách linh hoạt:
-    1. Ưu tiên lấy từ Streamlit Secrets (khi deploy lên Streamlit Cloud).
-    2. Nếu không có, lấy từ biến môi trường (file .env ở local).
-    """
-    if hasattr(st, 'secrets') and "GEMINI_API_KEY" in st.secrets:
-        return st.secrets["GEMINI_API_KEY"]
-    return os.getenv("GEMINI_API_KEY")
+TEXT_CHUNK_SIZE = 1500
+TEXT_CHUNK_OVERLAP = 200
+DEFAULT_MODEL = "gemini-1.5-flash"
+VECTOR_DB_SEARCH_RESULTS = 5
 
-# --- Cấu hình API và Model ---
-GEMINI_API_KEY = get_gemini_api_key()
-AVAILABLE_MODELS = {
-    "Nhanh & Tối ưu (Flash)": "gemini-1.5-flash-latest",
-    "Mạnh & Thông minh (Pro)": "gemini-1.5-pro-latest"
-}
+DEFAULT_SYSTEM_PROMPT = """Bạn là một trợ lý AI chuyên gia, được lập trình để phân tích và trả lời các câu hỏi dựa trên một tập hợp tài liệu được cung cấp.
+Nhiệm vụ của bạn là cung cấp câu trả lời chính xác, súc tích và chỉ dựa vào "NGỮ CẢNH" cho trước.
+Nếu thông tin không có trong ngữ cảnh, hãy trả lời một cách trung thực rằng "Dựa trên tài liệu được cung cấp, tôi không tìm thấy thông tin để trả lời câu hỏi này."
+Không được bịa đặt thông tin."""
 
-# --- Cấu hình xử lý văn bản ---
-TEXT_CHUNK_SIZE = 1000
-TEXT_CHUNK_OVERLAP = 150
-VECTOR_DB_SEARCH_RESULTS = 7
+SUMMARY_PROMPT_TEMPLATE = """Dựa vào toàn bộ "NGỮ CẢNH" dưới đây về một khóa học, hãy thực hiện các yêu cầu sau với vai trò là một chuyên gia phân tích:
+1.  **Tóm tắt Tổng quan:** Viết một đoạn văn súc tích (khoảng 3-5 câu) nêu bật những nội dung chính và mục tiêu của tài liệu.
+2.  **Các Ý tưởng Cốt lõi:** Liệt kê từ 5 đến 7 khái niệm, luận điểm, hoặc chủ đề quan trọng nhất dưới dạng gạch đầu dòng có giải thích ngắn gọn.
+3.  **Câu hỏi Gợi mở:** Đặt ra một câu hỏi sâu sắc để người đọc có thể tự suy ngẫm và nghiên cứu thêm về chủ đề này.
 
-# --- Cấu hình ứng dụng ---
-CHROMA_DB_PATH = "./pnote_chroma_db"
-USER_DATA_PATH = "./user_uploaded_data"
-MAX_FILE_SIZE_MB = 50
-DEFAULT_THEME = 'dark' # Theme mặc định khi người dùng truy cập lần đầu
+Hãy trình bày câu trả lời một cách chuyên nghiệp, có cấu trúc rõ ràng.
 
-# --- PROMPT MẪU ---
-DEFAULT_SYSTEM_PROMPT = """Bạn là PNote, một trợ lý AI chuyên gia về phân tích tài liệu. Nhiệm vụ của bạn là trả lời câu hỏi của người dùng DỰA HOÀN TOÀN vào "NGỮ CẢNH" được cung cấp.
+NGỮ CẢNH:
+---
+{context}
+---
 
-QUY TẮC BẮT BUỘC:
-1.  CHỈ được sử dụng thông tin có trong "NGỮ CẢNH". Tuyệt đối không tự ý suy diễn, bịa đặt, hay dùng kiến thức ngoài.
-2.  Nếu câu trả lời có trong ngữ cảnh, hãy trả lời một cách trực tiếp, súc tích và chuyên nghiệp.
-3.  Nếu thông tin không có trong "NGỮ CẢNH", hãy trả lời duy nhất một câu: "Tôi không tìm thấy thông tin này trong tài liệu được cung cấp."
-4.  Không bao giờ đưa ra ý kiến cá nhân.
-"""
+BẢN PHÂN TÍCH CỦA BẠN:"""
+
+QUIZ_PROMPT_TEMPLATE = """Với vai trò là một nhà giáo dục kinh nghiệm, hãy dựa vào "NGỮ CẢNH" được cung cấp để tạo ra chính xác {num_questions} câu hỏi trắc nghiệm (MCQ) chất lượng cao.
+**YÊU CẦU BẮT BUỘC:**
+1.  Câu hỏi phải kiểm tra sự hiểu biết, không chỉ là ghi nhớ thông tin.
+2.  Mỗi câu hỏi có 4 lựa chọn (A, B, C, D), trong đó chỉ có MỘT đáp án đúng. Các lựa chọn gây nhiễu phải hợp lý.
+3.  **TRẢ VỀ KẾT QUẢ DƯỚI DẠNG MỘT DANH SÁCH JSON HỢP LỆ VÀ CHỈ DUY NHẤT DANH SÁCH ĐÓ.**
+4.  Mỗi đối tượng JSON trong danh sách phải có các key: "question" (string), "options" (list of 4 strings), và "answer" (string, là nội dung của đáp án đúng).
+
+NGỮ CẢNH:
+---
+{context}
+---
+
+DANH SÁCH JSON:"""
