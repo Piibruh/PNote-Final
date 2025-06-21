@@ -1,32 +1,39 @@
 # app.py
-
-# Ghi chú: Đây là file trang Dashboard, là điểm vào đầu tiên của ứng dụng.
-# Nó chịu trách nhiệm hiển thị danh sách khóa học và cho phép tạo khóa học mới.
-
 import streamlit as st
 from core.services import service_manager, slugify
 from ui.utils import page_setup
-# NEW: Import hàm onboarding_popup trực tiếp
 from ui.onboarding import onboarding_popup
 import time
 
-# --- BƯỚC 1: THIẾT LẬP TRANG ---
-# Ghi chú: Hàm này sẽ cấu hình trang, áp dụng CSS, và quan trọng nhất là
-# đặt cờ "show_onboarding_popup" trong session_state nếu cần.
+# --- BƯỚC 1: THIẾT LẬP TRANG BAN ĐẦU ---
+# Hàm này sẽ chạy và thiết lập các state cần thiết, bao gồm cả
+# cờ 'onboarding_status' = 'needed' cho lần chạy đầu tiên.
 page_setup(page_title="PNote Dashboard", page_icon="📝", initial_sidebar_state="collapsed")
 
-# --- BƯỚC 2: XỬ LÝ CÁC HÀNH ĐỘNG TOÀN CỤC Ở CẤP CAO NHẤT ---
-# NEW: Đây là logic mới để xử lý popup một cách an toàn.
-# Nó kiểm tra cờ đã được đặt bởi page_setup().
-if st.session_state.get('show_onboarding_popup', False):
-    # Gọi hàm hiển thị popup ở đây, tại cấp cao nhất của trang.
+
+# --- BƯỚC 2: XỬ LÝ ONBOARDING THEO LUỒNG 2 BƯỚC AN TOÀN ---
+# Ghi chú: Đây là logic cốt lõi để sửa lỗi.
+
+# Trường hợp 1: Lần chạy đầu tiên, cần hiển thị nhưng chưa hiển thị ngay.
+if st.session_state.onboarding_status == 'needed':
+    # Thay đổi trạng thái và yêu cầu rerun.
+    # Ứng dụng sẽ hoàn thành 1 chu trình render đầy đủ.
+    st.session_state.onboarding_status = 'showing'
+    st.rerun()
+
+# Trường hợp 2: Sau khi rerun, ứng dụng đã ổn định, giờ mới hiển thị popup.
+if st.session_state.onboarding_status == 'showing':
+    # Gọi hàm hiển thị popup một cách an toàn.
     onboarding_popup()
-    # Sau khi dialog được gọi, tắt cờ này đi để nó không hiện lại trong các lần rerun sau.
-    st.session_state.show_onboarding_popup = False
+    # Sau khi người dùng đóng dialog, code sẽ chạy tiếp từ đây.
+    # Đánh dấu là đã hoàn thành để không hiển thị lại.
+    st.session_state.onboarding_status = 'complete'
+    st.rerun()
 
 
 # --- BƯỚC 3: HIỂN THỊ GIAO DIỆN CHÍNH CỦA TRANG ---
-# Ghi chú: Phần code dưới đây không thay đổi so với phiên bản trước.
+# Ghi chú: Phần code dưới đây chỉ chạy khi onboarding đã hoàn tất
+# hoặc không cần thiết, đảm bảo không có gì xung đột với dialog.
 
 st.markdown("""<div class="logo-box-large"><span class="logo-text-large">P</span></div>""", unsafe_allow_html=True)
 st.title("PNote Workspace")
