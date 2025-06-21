@@ -1,67 +1,25 @@
-# .gitignore
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Environment variables
+# Tệp môi trường
 .env
-.venv
-env/
+*.env*
+.env.example
+
+# Cache và các tệp do Python tạo ra
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Thư mục môi trường ảo
 venv/
-ENV/
-env.bak
-venv.bak
+.venv/
+env/
+.env/
 
-# Streamlit
-.streamlit/
+# IDE và các tệp cấu hình trình chỉnh sửa
+.vscode/
+.idea/
 
-# User data & Database
-/user_uploaded_data/
-/pnote_chroma_db/
+# Dữ liệu được tạo ra bởi ứng dụng
+# Quan trọng: Ngăn không cho cơ sở dữ liệu và dữ liệu người dùng bị commit lên Git.
+chroma_db/
+user_data/
